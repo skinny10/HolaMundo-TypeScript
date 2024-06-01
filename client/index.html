@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Platinum</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1 class="flex">Platinum</h1>
+    <ul id="alumnos"></ul>
+    <script>
+
+        let idLosAlumnos = 0;
+        const listaAlumnos = document.getElementById('alumnos');
+
+        function pintarAlumno(alumno) {
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <strong>Nombre:</strong> ${alumno.name} <br>
+                <strong>Apellido:</strong> ${alumno.lastName} <br>
+                <strong>Edad:</strong> ${alumno.age} <br>
+                <strong>Tipo de Sangre:</strong> ${alumno.typeBlood}
+            `;
+            listaAlumnos.appendChild(li);
+        }
+
+        function pintarAlumnos(alumnos) {
+            for (let alumno of alumnos) {
+                pintarAlumno(alumno);
+            }            
+        }
+
+        function obtenerAlumnos() {
+                fetch('http://localhost:3000/alumnos')
+                .then(res => res.json())
+                .then(data => {
+                    const alumnos = data.alumnos;
+                    pintarAlumnos(alumnos);
+                    idLosAlumnos = alumnos[alumnos.length -1].id;
+                    obtenerAlumnosNuevos(3000);
+                });
+            }
+
+            obtenerAlumnos();
+
+            function obtenerAlumnosNuevos (interval) {
+                fetch('http://localhost:3000/alumnos/update?idLosAlumnos=' + idLosAlumnos)
+                .then(res => res.json())
+                .then(data => {
+                    const alumnos = data.nuevosAlumnos;
+                    if (alumnos.length > 0 ) {
+                        pintarAlumnos(alumnos);
+                        idLosAlumnos = alumnos[alumnos.length -1].id;
+                    }
+                    setTimeout(() => obtenerAlumnosNuevos(interval), interval);
+                });
+            }
+
+
+    </script>
+</body>
+</html>
